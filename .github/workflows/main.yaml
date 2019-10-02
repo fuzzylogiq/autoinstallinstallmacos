@@ -9,7 +9,9 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: run aaim.py
-        run: sudo python ./autoinstallinstallmacos.py
+        run: |
+           sudo pip install xattr 
+           sudo python ./autoinstallinstallmacos.py
       - uses: actions/upload-artifact@master
         with:
           name: cache.plist
