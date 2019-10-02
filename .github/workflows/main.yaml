@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v1
       - name: run aaim.py
         run: sudo python ./autoinstallinstallmacos.py
-      - uses: actions/upload_artifact@vmaster
+      - uses: actions/upload-artifact@vmaster
         with:
           name: cache.plist
           path: .cached_products
