@@ -7,6 +7,10 @@ jobs:
     runs-on: macos-latest
 
     steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: cache.plist
+          path: .cached_products
       - uses: actions/checkout@v1
       - name: run aaim.py
         run: |
