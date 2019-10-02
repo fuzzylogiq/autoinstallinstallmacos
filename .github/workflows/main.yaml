@@ -1,0 +1,16 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: run aaim.py
+        run: sudo python ./autoinstallinstallmacos.py
+      - uses: actions/upload_artifact@vmaster
+        with:
+          name: cache.plist
+          path: .cached_products
