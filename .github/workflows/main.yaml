@@ -7,16 +7,21 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/download-artifact@master
+      - uses: actions/aws/cli@master
         with:
-          name: cache.plist
-          path: .cached_products
+          args: "s3 cp s3://autoinstallinstallmacos-cache-bucket/cache.plist ./"
+          secrets: ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+
       - uses: actions/checkout@v1
-      - name: run aaim.py
-        run: |
+        with:
+          name: run aaim.py
+          run: |
            sudo pip install xattr 
            sudo python ./autoinstallinstallmacos.py
-      - uses: actions/upload-artifact@master
+
+      - uses: actions/aws/cli@master
         with:
-          name: cache.plist
-          path: .cached_products
+          args: "s3 cp ./.cache.plist s3://autoinstallinstallmacos-cache-bucket"
+          secrets: ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+
+

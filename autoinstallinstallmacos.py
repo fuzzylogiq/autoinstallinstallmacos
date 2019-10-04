@@ -26,25 +26,43 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals)
 
 import os
-import json
 import datetime
 import plistlib
+import installinstallmacos as iim
+import sys
 
-from installinstallmacos import *
+DEFAULT_SUCATALOGS = {
+    '17': 'https://swscan.apple.com/content/catalogs/others/'
+          'index-10.13-10.12-10.11-10.10-10.9'
+          '-mountainlion-lion-snowleopard-leopard.merged-1.sucatalog',
+    '18': 'https://swscan.apple.com/content/catalogs/others/'
+          'index-10.14-10.13-10.12-10.11-10.10-10.9'
+          '-mountainlion-lion-snowleopard-leopard.merged-1.sucatalog',
+}
+
+
+SEED_CATALOGS_PLIST = (
+    '/System/Library/PrivateFrameworks/Seeding.framework/Versions/Current/'
+    'Resources/SeedCatalogs.plist'
+)
+
 workdir = "."
+
 
 def default(o):
     if isinstance(o, (datetime.date, datetime.datetime)):
         return o.isoformat()
 
+
 def check_cache(workdir):
-    cache_path = os.path.join(workdir, ".cached_products")
+    cache_path = os.path.join(workdir, ".cache.plist")
     if os.path.isfile(cache_path):
         with open(cache_path, "r") as f:
             return plistlib.readPlist(f)
 
+
 def write_cache(workdir, product_id, product):
-    cache_path = os.path.join(workdir, ".cached_products")
+    cache_path = os.path.join(workdir, ".cache.plist")
     products = {}
     if os.path.isfile(cache_path):
         with open(cache_path, "r") as f:
@@ -53,12 +71,13 @@ def write_cache(workdir, product_id, product):
     with open(cache_path, "w") as f:
         plistlib.writePlist(products, f)
 
-def main():
-    su_catalog_url = get_default_catalog()
 
-    catalog = download_and_parse_sucatalog(
+def main():
+    su_catalog_url = iim.get_default_catalog()
+
+    catalog = iim.download_and_parse_sucatalog(
         su_catalog_url, workdir)
-    product_info = os_installer_product_info(
+    product_info = iim.os_installer_product_info(
         catalog, workdir)
 
     print(product_info)
@@ -74,12 +93,15 @@ def main():
         print(cached_products)
 
     for product_id, product in product_info.items():
-        if cached_products and  product_id in cached_products.keys():
+        if cached_products and product_id in cached_products.keys():
             print("Product %s is cached..." % product_id)
         else:
-            print("Product %s is not in the cache, downloading..." % product_id)
-            replicate_product(catalog, product_id, workdir, ignore_cache=True)
+            print("Product %s is not in the cache, downloading..."
+                  % product_id)
+            iim.replicate_product(catalog, product_id,
+                                  workdir, ignore_cache=True)
             write_cache(workdir, product_id, product)
+
 
 if __name__ == "__main__":
     main()
