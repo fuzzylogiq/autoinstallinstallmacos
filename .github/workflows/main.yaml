@@ -9,14 +9,14 @@ jobs:
     steps:
      - uses: actions/checkout@v1
      - uses: chrislennon/action-aws-cli@1.1
-     - run: s3 cp s3://autoinstallinstallmacos-cache-bucket/cache.plist ./
+     - run: aws s3 cp s3://autoinstallinstallmacos-cache-bucket/cache.plist ./
        env:
          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
      - run: |
            sudo pip install xattr 
            sudo python ./autoinstallinstallmacos.py
-     - run: s3 cp ./.cache.plist s3://autoinstallinstallmacos-cache-bucket
+     - run: aws s3 cp ./.cache.plist s3://autoinstallinstallmacos-cache-bucket
        env:
          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
