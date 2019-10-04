@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-        run: |
+      - run: |
            sudo pip install xattr 
            sudo python ./autoinstallinstallmacos.py
       - uses: actions/aws/cli@master
