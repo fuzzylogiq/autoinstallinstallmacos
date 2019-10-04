@@ -59,7 +59,7 @@ def check_cache(workdir):
     cache_path = os.path.join(workdir, ".cache.plist")
     if os.path.isfile(cache_path):
         with open(cache_path, "r") as f:
-            return plistlib.readPlist(f)
+            return plistlib.load(f)
 
 
 def write_cache(workdir, product_id, product):
@@ -67,10 +67,10 @@ def write_cache(workdir, product_id, product):
     products = {}
     if os.path.isfile(cache_path):
         with open(cache_path, "r") as f:
-            products = plistlib.readPlist(f)
+            products = plistlib.load(f)
     products[product_id] = product
     with open(cache_path, "w") as f:
-        plistlib.writePlist(products, f)
+        plistlib.dump(products, f)
 
 
 def main():
@@ -98,7 +98,7 @@ def main():
             print("Product %s is not in the cache, downloading..."
                   % product_id)
 
-            with contextlib.redirect_stdout(None):
+            with contextlib.redirect_stderr(None):
                 iim.replicate_product(catalog, product_id,
                                       workdir, ignore_cache=True)
             write_cache(workdir, product_id, product)
