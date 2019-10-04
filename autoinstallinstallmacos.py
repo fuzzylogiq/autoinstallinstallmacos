@@ -107,7 +107,7 @@ def main():
 
             # Create output directory
             if not os.path.exists(os.path.join(workdir, "output")):
-                os.mkdir(os.path.join(workdir, "output"), mode=0o775))
+                os.mkdir(os.path.join(workdir, "output"), mode=0o775)
             sparse_diskimage_path = os.path.join(workdir, "output",
                                                  volname + '.sparseimage')
             if os.path.exists(sparse_diskimage_path):
