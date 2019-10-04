@@ -98,10 +98,60 @@ def main():
             print("Product %s is not in the cache, downloading..."
                   % product_id)
 
-            with contextlib.redirect_stderr(None):
-                iim.replicate_product(catalog, product_id,
-                                      workdir, ignore_cache=True)
-            write_cache(workdir, product_id, product)
+            iim.replicate_product(catalog, product_id,
+                                  workdir, ignore_cache=True)
+            # generate a name for the sparseimage
+            volname = ('Install_macOS_%s-%s'
+                       % (product_info[product_id]['version'],
+                          product_info[product_id]['BUILD']))
+
+            # Create output directory
+            if not os.path.exists(os.path.join(workdir, "output")):
+                os.mkdir(os.path.join(workdir, "output", mode=0o775))
+            sparse_diskimage_path = os.path.join(workdir, "output",
+                                                 volname + '.sparseimage')
+            if os.path.exists(sparse_diskimage_path):
+                os.unlink(sparse_diskimage_path)
+
+            # make an empty sparseimage and mount it
+            print('Making empty sparseimage...')
+            sparse_diskimage_path = iim.make_sparse_image(
+                                        volname,
+                                        sparse_diskimage_path)
+            mountpoint = iim.mountdmg(sparse_diskimage_path)
+            if mountpoint:
+                # install the product to the mounted sparseimage volume
+                success = iim.install_product(
+                    product_info[product_id]['DistributionPath'],
+                    mountpoint)
+                if not success:
+                    print('Product installation failed.', file=sys.stderr)
+                    iim.unmountdmg(mountpoint)
+                    exit(-1)
+                # add the seeding program xattr to the app if applicable
+                # seeding_program = get_seeding_program(args.catalogurl)
+                # if seeding_program:
+                #    installer_app = find_installer_app(mountpoint)
+                #    if installer_app:
+                #        xattr.setxattr(installer_app, 'SeedProgram',
+                #                       seeding_program)
+                print('Product downloaded and installed to %s'
+                      % sparse_diskimage_path)
+                # Create a r/o compressed diskimage
+                # containing the Install macOS app
+                compressed_diskimagepath = os.path.join(
+                    workdir, "output", volname + '.dmg')
+                if os.path.exists(compressed_diskimagepath):
+                    os.unlink(compressed_diskimagepath)
+                app_path = iim.find_installer_app(mountpoint)
+                if app_path:
+                    iim.make_compressed_dmg(app_path, compressed_diskimagepath)
+                # unmount sparseimage
+                iim.unmountdmg(mountpoint)
+                # delete sparseimage since we don't need it any longer
+                os.unlink(sparse_diskimage_path)
+
+                write_cache(workdir, product_id, product)
 
 
 if __name__ == "__main__":
