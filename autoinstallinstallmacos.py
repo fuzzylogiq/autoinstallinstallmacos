@@ -30,6 +30,7 @@ import datetime
 import plistlib
 import installinstallmacos as iim
 import sys
+import contextlib
 
 DEFAULT_SUCATALOGS = {
     '17': 'https://swscan.apple.com/content/catalogs/others/'
@@ -75,12 +76,11 @@ def write_cache(workdir, product_id, product):
 def main():
     su_catalog_url = iim.get_default_catalog()
 
-    catalog = iim.download_and_parse_sucatalog(
-        su_catalog_url, workdir)
-    product_info = iim.os_installer_product_info(
-        catalog, workdir)
-
-    print(product_info)
+    with contextlib.redirect_stdout(None):
+        catalog = iim.download_and_parse_sucatalog(
+            su_catalog_url, workdir)
+        product_info = iim.os_installer_product_info(
+            catalog, workdir)
 
     if not product_info:
         print("No macOS installer products found in the sucatalog.",
@@ -89,8 +89,7 @@ def main():
 
     cached_products = check_cache(workdir)
     if cached_products:
-        print("yes found cache!")
-        print(cached_products)
+        print("Found product cache...")
 
     for product_id, product in product_info.items():
         if cached_products and product_id in cached_products.keys():
@@ -98,8 +97,10 @@ def main():
         else:
             print("Product %s is not in the cache, downloading..."
                   % product_id)
-            iim.replicate_product(catalog, product_id,
-                                  workdir, ignore_cache=True)
+
+            with contextlib.redirect_stdout(None):
+                iim.replicate_product(catalog, product_id,
+                                      workdir, ignore_cache=True)
             write_cache(workdir, product_id, product)
 
 
