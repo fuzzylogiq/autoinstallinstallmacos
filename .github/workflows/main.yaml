@@ -12,7 +12,7 @@ jobs:
            sudo pip3 install xattr 
            sudo pip3 install awscli
            ls="$(aws s3 ls autoinstallinstallmacos-cache-bucket)"
-           grep -q cache.plist <<< "$ls" && aws s3 cp s3://autoinstallinstallmacos-cache-bucket/cache.plist ./
+           grep -q .cache.plist <<< "$ls" && aws s3 cp s3://autoinstallinstallmacos-cache-bucket/.cache.plist ./
            sudo python3 ./autoinstallinstallmacos.py
            aws s3 cp ./.cache.plist s3://autoinstallinstallmacos-cache-bucket
        env:
