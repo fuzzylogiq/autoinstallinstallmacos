@@ -11,7 +11,9 @@ jobs:
       - name: download cache
         with:
           args: "s3 cp s3://autoinstallinstallmacos-cache-bucket/cache.plist ./"
-          secrets: ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+          secrets:
+            - "AWS_ACCESS_KEY_ID"
+            - "AWS_SECRET_ACCESS_KEY"
       - uses: actions/checkout@v1
       - name: run aaim.py
         run: |
@@ -21,6 +23,8 @@ jobs:
       - name: upload cache
         with:
           args: "s3 cp ./.cache.plist s3://autoinstallinstallmacos-cache-bucket"
-          secrets: ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+          secrets:
+            - "AWS_ACCESS_KEY_ID"
+            - "AWS_SECRET_ACCESS_KEY"
 
 
