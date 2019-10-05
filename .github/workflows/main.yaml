@@ -11,11 +11,11 @@ jobs:
      - run: |
            sudo pip3 install xattr 
            sudo pip3 install awscli
-           ls="$(aws s3 ls autoinstallinstallmacos-cache-bucket)"
-           grep -q .cache.plist <<< "$ls" && aws s3 cp s3://autoinstallinstallmacos-cache-bucket/.cache.plist ./
+           ls="$(aws s3 ls autoinstallinstallmacs)"
+           grep -q .cache.plist <<< "$ls" && aws s3 cp s3://autoinstallinstallmacos/.cache.plist ./
            sudo python3 ./autoinstallinstallmacos.py
-           ls -l ./output
-           aws s3 cp ./.cache.plist s3://autoinstallinstallmacos-cache-bucket
+           aws s3 sync ./content s3://autoinstallinstallmacos
+           aws s3 cp ./.cache.plist s3://autoinstallinstallmacos
        env:
          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
