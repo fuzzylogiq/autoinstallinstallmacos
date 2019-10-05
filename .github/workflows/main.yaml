@@ -15,7 +15,7 @@ jobs:
      - name: check aws for cache
        run: |
            ls="$(aws s3 ls autoinstallinstallmacos)"
-           grep -q .cache.plist <<< "$ls" && aws s3 cp s3://autoinstallinstallmacos/.cache.plist ./
+           grep -q .cache.plist <<< "$ls" && aws s3 cp s3://autoinstallinstallmacos/.cache.plist ./ || :
        env:
          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
