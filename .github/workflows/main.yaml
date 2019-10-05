@@ -8,12 +8,21 @@ jobs:
 
     steps:
      - uses: actions/checkout@v1
+     - name: install prerequisites
      - run: |
            sudo pip3 install xattr 
            sudo pip3 install awscli
-           ls="$(aws s3 ls autoinstallinstallmacs)"
+     - name: check aws for cache
+     - run: |
+           ls="$(aws s3 ls autoinstallinstallmacos)"
            grep -q .cache.plist <<< "$ls" && aws s3 cp s3://autoinstallinstallmacos/.cache.plist ./
-           sudo python3 ./autoinstallinstallmacos.py
+       env:
+         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+     - name: autoinstallinstallmacos
+     - run: sudo python3 ./autoinstallinstallmacos.py
+     - name: sync back to aws
+     - run:
            aws s3 sync ./content s3://autoinstallinstallmacos
            aws s3 cp ./.cache.plist s3://autoinstallinstallmacos
        env:
