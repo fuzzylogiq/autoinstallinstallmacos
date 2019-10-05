@@ -22,7 +22,7 @@ jobs:
      - name: autoinstallinstallmacos
        run: sudo python3 ./autoinstallinstallmacos.py
      - name: sync back to aws
-       run:
+       run: |
            aws s3 sync ./content s3://autoinstallinstallmacos
            aws s3 cp ./.cache.plist s3://autoinstallinstallmacos
        env:
